@@ -1,0 +1,54 @@
+name: Code quality checks with black, flake8, and pytest
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.11
+
+      # Install Black and flake8
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install black 
+          pip install flake8
+
+      # Check code formatting using Black
+      - name: Check code formatting
+        run: |
+          if black --check --diff --config black.toml .; then
+            echo "No formatting required. on to next stage."
+          else
+            echo "Needs formatting. Build Failed."
+            exit 1
+          fi
+
+      # Run Flake8  
+      - name: Run flake8
+        if: success()
+        run: |
+          flake8 .
+
+
+      - name: install pytest
+        run: |
+          pip install pytest
+          pip install pytest-cov
+          pip install pytest-mock
+          pip install boto3
+
+
+      - name: Run pytest
+        run: |
+          export PYTHONPATH="$PYTHONPATH:./"
+          export AWS_REGION="us-west-2"
+          pytest --cov src/
