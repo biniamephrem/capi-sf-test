@@ -24,7 +24,10 @@ def test_handler_missing_cc_id():
     body = extract_API_pyload_body(result)
     assert body["message"] == "Falure, No Credit Card detected. Please try again"
     assert body["result"] == "Declined"
-# For testing code 
+
+
+# For testing code
+
 
 def test_handler_missing_transaction_id():
     result = handler(prepare_API_payload({"card_id": "Mickey Mosuse"}), None)
